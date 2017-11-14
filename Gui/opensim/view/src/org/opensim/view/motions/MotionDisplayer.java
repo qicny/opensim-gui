@@ -382,13 +382,16 @@ public class MotionDisplayer {
         currentForceShape = DEFAULT_FORCE_SHAPE;
         modelVisJson = ViewDB.getInstance().getModelVisualizationJson(model);
         setupMotionDisplay();
-        // create a buffer to be used for comuptation of constrained states
-        //statesBuffer = new double[model.getNumStateVariables()];
         
         modelVisJson.addMotionDisplayer(this);
         if (model instanceof ModelForExperimentalData) return;
 
     }
+    /**
+     * This method classifies experimental data and creates visualizer objects 
+     * to represent them. The UUIDs for these objects are cached in ExperimentalDataObject
+     * so they can later be resized/located/updated per frame.
+     */
     public void setupMotionDisplay() { 
         if (simmMotionData == null)
            return;
@@ -408,6 +411,7 @@ public class MotionDisplayer {
             mot.setMotionDisplayer(this);
             createMotionObjectsGroupJson();
             addExperimentalDataObjectsToJson(objects);
+            // create objects and cache their uuids
             for(ExperimentalDataObject nextObject:objects){
                 if (nextObject.getObjectType()==ExperimentalDataItemType.MarkerData){
                     bindMarkerToVisualizerObjectKeepHandle(nextObject);
@@ -416,8 +420,6 @@ public class MotionDisplayer {
                 } 
                 
             }
-            // create objects and cache their uuids
-            //createTrails(model);
             ViewDB.getInstance().addVisualizerObject(createJsonForMotionObjects());
             JSONObject modelObjectJson = (JSONObject) modelVisJson.get("object");
             if (modelObjectJson.get("children") == null) {
